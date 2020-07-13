@@ -22,11 +22,11 @@ args=parser.parse_args()
 
 bimfile = args.bim
 bedfile = args.bed
-out = file(args.out,'w')
+out = open(args.out,'w')
 
 #read in 
-bim = pd.read_csv(bimfile, header=-1, sep='\s+', dtype = str)
-bed = pd.read_csv(bedfile, header=-1, sep='\s+', dtype = str)
+bim = pd.read_csv(bimfile, header=None, sep='\s+', dtype = str)
+bed = pd.read_csv(bedfile, header=None, sep='\s+', dtype = str)
 
 bim['chr'] = bim[0] # temporarily store original chr values
 if args.codechr=='T':

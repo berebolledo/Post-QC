@@ -49,7 +49,7 @@ def gFlip(gtype):
 
 
 #read in 
-bim = pd.read_csv(bimfile, header=-1, sep='\s+', dtype = str)
+bim = pd.read_csv(bimfile, header=None, sep='\s+', dtype = str)
 legend = pd.read_csv(legendfile, header=0, sep='\s+', dtype = str)
 
 #creating an index according to chr and bp, then A1 and A2 allele
@@ -77,7 +77,7 @@ bim['flip'] = 0
 # start matching
 for i,snp in enumerate(bim['position']):
     if i%1000==0:
-        print "On line: ", i
+        print("On line: ", i)
     if bim['indel'][i] == 0: #not indel
         gtype = legend_dict.get(snp, 'NA') #locus not found in 1000g
         if gtype=='NA':
@@ -99,9 +99,9 @@ for i,snp in enumerate(bim['position']):
             bim['remove'][i]=1
 
 
-out_indel = file(out + ".Indel.txt", 'w')
-out_remove = file(out + ".NonMatching.txt", 'w')
-out_flip = file( out + ".FlipStrand.txt", 'w')
+out_indel = open(out + ".Indel.txt", 'w')
+out_remove = open(out + ".NonMatching.txt", 'w')
+out_flip = open( out + ".FlipStrand.txt", 'w')
 
 for i in range(0,bim[0].size):
     if bim['indel'][i]==1:
