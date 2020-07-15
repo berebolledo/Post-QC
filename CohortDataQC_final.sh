@@ -1,4 +1,8 @@
-## !/bin/sh
+#! /bin/bash
+
+#$ -N ancestQC
+#$ -o /hpcudd/home/boris/storage/data/logs
+#$ -e /hpcudd/home/boris/storage/data/logs
 
 ## A script for processing cohort data files for use in LAI with 1000 genomes reference individuals
 ## Written by Elizabeth Atkinson. 1/23/18
@@ -13,8 +17,24 @@
 
 ## Usage is CohortDataQC.sh <data-stem> <dbSNP-bedfile> <ref-panel-legend, i.e. from 1kG>
 
+
+if [ $HOSTNAME == 'sofia.udd.cl' ] || [[ $HOSTNAME == compute*-1-*.local ]]
+then
+    baseDir="/hpcudd/ICIM/boris/projects/local_ancestry/00_newpipeline"
+    export PATH="/hpcudd/home/boris/miniconda3/bin:$PATH"
+elif [ $HOSTNAME == 'mendel' ]
+then
+    baseDir="/home/boris/storage/00_papers/local_ancestry_pipeline/00_newpipeline"
+else
+    echo "Unrecognized host $HOSTNAME"
+    echo "can't locate genome references"
+    exit 1
+fi
+
+
 ## Mendel directories
-baseDir="/home/boris/storage/00_papers/local_ancestry_pipeline/00_newpipeline"
+#baseDir="/home/boris/storage/00_papers/local_ancestry_pipeline/00_newpipeline"
+
 Legend="1000GP_Phase3/autosome_1000GP_Phase3_GRCh37_combined.legend.gz"
 snp151="dbSNPv151_20180423/dbSNPv151.bed.gz"
 scripts="${baseDir}/Post-QC"
