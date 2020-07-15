@@ -50,7 +50,8 @@ def gFlip(gtype):
 
 #read in 
 bim = pd.read_csv(bimfile, header=None, sep='\s+', dtype = str)
-legend = pd.read_csv(legendfile, header=0, sep='\s+', dtype = str)
+legend = pd.read_csv(legendfile, header=None, sep='\s+', dtype = str)
+legend.columns = ['chr', 'position', 'id', 'a0', 'a1', 'type']
 
 #creating an index according to chr and bp, then A1 and A2 allele
 bim['position'] = pd.Series(bim[0].astype(str)).str.cat(bim[3].astype(str), sep=":") # key in the form of chr:bp

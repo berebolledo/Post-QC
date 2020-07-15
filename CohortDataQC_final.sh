@@ -13,14 +13,38 @@
 
 ## Usage is CohortDataQC.sh <data-stem> <dbSNP-bedfile> <ref-panel-legend, i.e. from 1kG>
 
+## Mendel directories
+baseDir="/home/boris/storage/00_papers/local_ancestry_pipeline/00_newpipeline"
+Legend="1000GP_Phase3/autosome_1000GP_Phase3_GRCh37_combined.legend.gz"
+snp151="dbSNPv151_20180423/dbSNPv151.bed.gz"
+scripts="${baseDir}/Post-QC"
 
 ##  Unpack the parameters into labelled variables
 DATA=$1
-DBSNP=$2
-LEG=$3
+CHROM=$2
 
-#keep only the autosomes in the data file
-plink --bfile $DATA --chr 1-22 --make-bed --out $DATA.auto
+## Make working directory
+prefix=chr${CHROM}_${DATA}
+mkdir -p $prefix
+
+## Get ref snps and legend
+
+tabix ${baseDir}/${snp151} ${CHROM} > ${prefix}/chr${CHROM}.db151.bed
+DBSNP=chr${CHROM}.db151.bed
+
+tabix ${baseDir}/${Legend} ${CHROM} > ${prefix}/chr${CHROM}.1000GP.legend
+LEG=chr${CHROM}.1000GP.legend
+
+## keep only the autosomes in the data file
+plink --bfile $DATA --chr $CHROM --make-bed --out ${prefix}/chr${CHROM}_$DATA.auto
+
+DATA=${prefix}
+cd ${prefix}
+
+## Fix "." in bim
+mv $DATA.auto.bim $DATA.auto.bim.old
+awk 'BEGIN{OFS="\t"}{if($2~/rs/) print $0; else print $1, $1":"$4,$3,$4,$5,$6}' $DATA.auto.bim.old > $DATA.auto.bim
+
 
 ## Find and get rid of duplicate loci in the bim file
 #then keep the good SNPs in the plink file
@@ -35,14 +59,14 @@ plink --bfile $DATA.auto --extract $DATA.SNPstoKeep --make-bed --out $DATA.auto.
 
 
 ## Update SNP IDs to dbsnp 144
-python update_rsID_bim_ega.py --bim $DATA.auto.nodup.bim --bed $DBSNP --format T --codechr F --out $DATA.auto.nodup.dbsnp.bim
+python ${scripts}/update_rsID_bim_arg.py --bim $DATA.auto.nodup.bim --bed $DBSNP --format T --codechr F --out $DATA.auto.nodup.dbsnp.bim
 
 #copy the other files over to this name
 cp $DATA.auto.nodup.bed $DATA.auto.nodup.dbsnp.bed
 cp $DATA.auto.nodup.fam $DATA.auto.nodup.dbsnp.fam
 
 #orient to 1000G
-python match_against_1000g_v2.py --bim $DATA.auto.nodup.dbsnp.bim --legend $LEG --out $DATA.1kg
+python ${scripts}/match_against_1000g_v2.py --bim $DATA.auto.nodup.dbsnp.bim --legend $LEG --out $DATA.1kg
 # This script has three outputs: ##modified to be suffixed to allow for full paths to be input
 # 1) [outfile].Indel.txt: a bim file of indels 
 # 2) [outfile].NonMatching.txt: a bim file containing loci not found in 1000 genome, or has different coding alleles than 1000 genome (tri-allelic, for example). They should be removed.
@@ -65,8 +89,23 @@ paste nonCount flipcount totalsites > SiteCounts
 awk '{if ($1/$5 > 0.01) print "WARNING: "$1/$5*100"% of sites are problematic when compared to 1000G. This could be indicative of a different reference build or other date file incompatibility." }' SiteCounts > Warnings.out
 
 ## Find and remove A/T C/G loci
-python find_cg_at_snps.py $DATA.auto.nodup.dbsnp.1ksites.flip.bim > $DATA.ATCGsites
+python ${scripts}/find_cg_at_snps.py $DATA.auto.nodup.dbsnp.1ksites.flip.bim > $DATA.ATCGsites
 
 plink --bfile $DATA.auto.nodup.dbsnp.1ksites.flip --exclude $DATA.ATCGsites --make-bed --out $DATA.QCed
 
 #cohort data is now formatted to merge properly with the 1000G reference panel
+
+## clean up
+if [ -s $DATA.QCed.bed ]
+then
+    mkdir -p tmp
+    mv $DATA.QCed* tmp
+    mv Warnings.out tmp
+    rm -f chr${CHROM}*
+    rm -f *ount*
+    rm -f totalsites
+    mv tmp/* .
+    rm -fr tmp
+fi
+
+
