@@ -29,7 +29,7 @@ fi
 BASE=$1
 CHROM=$2
 
-DATA=chr${CHROM}_${DATA}
+DATA=chr${CHROM}_${BASE}
 cd $DATA
 
 REF="${baseDir}/1000GP_Phase3_3WayAdmixture_reference/1000GP_Phase3_3WayAdmixture_ref"
@@ -82,5 +82,19 @@ bgzip $DATA.QCed.1kmerge.filt.phased.ref.recode.vcf
 awk -v chrom=${CHROM} '$1!~/position/{print chrom"\t"$1"\t"$3}' ${GEN} > genmap_${CHROM}
 
 rfmix -f $DATA.QCed.1kmerge.filt.phased.cohort.recode.vcf.gz -r $DATA.QCed.1kmerge.filt.phased.ref.recode.vcf.gz --chromosome=$CHROM -m $MAP -g genmap_${CHROM} -n 5 -e 1 --reanalyze-reference --n-threads=8 -o $DATA.rfmix
+
+## clean up
+if [ -s $DATA.rfmix.msp.tsv ]
+then
+    mkdir -p tmp
+    mv *recode* tmp/
+    mv *rfmix* tmp/
+    rm -f shapeit_*
+    rm -f $DATA*
+    rm -f genmap_$CHROM
+    rm -f ref.sample.map
+    mv tmp/* .
+    rm -fr tmp
+fi
 
 
