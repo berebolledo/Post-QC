@@ -1,4 +1,11 @@
 #! /bin/bash
+
+#$ -N rfmix
+#$ -o /hpcudd/home/boris/storage/data/logs
+#$ -e /hpcudd/home/boris/storage/data/logs
+#$ -pe smp 8
+
+
 ### Elizabeth G. Atkinson 
 ### 2/22/18
 ## post-processing shapeit haps/sample files to be input into RFmix for cohort local ancestry inference
