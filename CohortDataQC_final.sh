@@ -4,6 +4,9 @@
 #$ -o /hpcudd/home/boris/storage/data/logs
 #$ -e /hpcudd/home/boris/storage/data/logs
 
+
+## Adapted by Boris Rebolledo-Jaramillo to work on local infraestructure
+
 ## A script for processing cohort data files for use in LAI with 1000 genomes reference individuals
 ## Written by Elizabeth Atkinson. 1/23/18
 # sub-scripts for processing steps courtesy of Meng Lin and Chris Gignoux
