@@ -76,13 +76,12 @@ cut -f2,4 $DATA.auto.bim| uniq -f1 > $DATA.NonDupSNPs
 cut -f2,4 $DATA.auto.bim| uniq -D -f1 > $DATA.DuplicateSNPs
 cat $DATA.DuplicateSNPs | uniq -f1 > $DATA.FirstDup
 #cat $DATA.NonDupSNPs $DATA.FirstDup > $DATA.SNPstoKeep
-## Plink would recall n-as many based on the First Dup, regardless
-## So I am choosing to fully delete conflicting cases
-
-cat $DATA.NonDupSNPs > $DATA.SNPstoKeep
+## The list of unique ids contains duplicate ids, so
+## rather remove duplicates intead of keeping unique ids
+## (which still contains duplicted ids)
 
 #set up environment to run plink again
-plink --bfile $DATA.auto --extract $DATA.SNPstoKeep --make-bed --out $DATA.auto.nodup
+plink --bfile $DATA.auto --exclude $DATA.FirstDup --make-bed --out $DATA.auto.nodup
 
 
 ## Update SNP IDs to dbsnp 144
