@@ -75,7 +75,11 @@ awk 'BEGIN{OFS="\t"}{if($2~/rs/) print $0; else print $1, $1":"$4,$3,$4,$5,$6}' 
 cut -f2,4 $DATA.auto.bim| uniq -f1 > $DATA.NonDupSNPs
 cut -f2,4 $DATA.auto.bim| uniq -D -f1 > $DATA.DuplicateSNPs
 cat $DATA.DuplicateSNPs | uniq -f1 > $DATA.FirstDup
-cat $DATA.NonDupSNPs $DATA.FirstDup > $DATA.SNPstoKeep
+#cat $DATA.NonDupSNPs $DATA.FirstDup > $DATA.SNPstoKeep
+## Plink would recall n-as many based on the First Dup, regardless
+## So I am choosing to fully delete conflicting cases
+
+cat $DATA.NonDupSNPs > $DATA.SNPstoKeep
 
 #set up environment to run plink again
 plink --bfile $DATA.auto --extract $DATA.SNPstoKeep --make-bed --out $DATA.auto.nodup
