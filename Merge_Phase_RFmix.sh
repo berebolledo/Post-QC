@@ -17,6 +17,7 @@
 ## GEN expected to be in the format of the hapmap recombination map
 ## ancestry reference map assigns reference individuals to their ancestral populations of origin, as described in the RFMix manual
 
+source $HOME/.bash_profile
 
 if [ $HOSTNAME == 'sofia.udd.cl' ] || [[ $HOSTNAME == compute*-1-*.local ]]
 then
@@ -39,7 +40,7 @@ CHROM=$2
 DATA=chr${CHROM}_${BASE}
 cd $DATA
 
-REF="${baseDir}/1000GP_3POP_admixture_reference/1000GP_3POP_thinned_nam.QCed"
+REF="${baseDir}/1000GP_3POP_admixture_reference/1000GP_3POP_thinned.QCed"
 
 #Genetic map
 GEN=${baseDir}/1000GP_Phase3/genetic_map_chr${CHROM}_combined_b37.txt
