@@ -39,13 +39,13 @@ CHROM=$2
 DATA=chr${CHROM}_${BASE}
 cd $DATA
 
-REF="${baseDir}/1000GP_Phase3_3WayAdmixture_reference/1000GP_Phase3_3WayAdmixture_ref"
+REF="${baseDir}/1000GP_3POP_admixture_reference/1000GP_3POP_thinned_nam.QCed"
 
 #Genetic map
 GEN=${baseDir}/1000GP_Phase3/genetic_map_chr${CHROM}_combined_b37.txt
 
 #Sample map
-awk '{gsub("CEU", "EUR"); gsub("YRI", "AFR");print $2"\t"$1}' $REF.fam > ref.sample.map
+awk '{print $2"\t"$1}' $REF.fam > ref.sample.map
 MAP=ref.sample.map
 
 #cohort data is now formatted to merge properly with the 1000G reference panel from step 1 - suffixed .QCed
